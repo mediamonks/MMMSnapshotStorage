@@ -18,8 +18,6 @@ source 'https://cdn.cocoapods.org/'
 pod 'MMMSnapshotStorage'
 ```
 
-(Use 'MMMSnapshotStorage/ObjC' when Swift wrappers are not needed.)
-
 ## Usage
 
 TBD
