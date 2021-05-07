@@ -11,7 +11,7 @@ import MMMPromisingResult
 
 /// Support for simple snapshot-based persistence.
 ///
-/// Each model that needs to store its state for the next session is provided (by its owner) with a container.
+/// Each model that needs to store its state is provided (by its owner) with a container.
 /// The container is then used to save or load the state as a single "snapshot".
 public protocol SnapshotStorage {
 	/// Returns a container prepared to load/store snapshots of a single object.

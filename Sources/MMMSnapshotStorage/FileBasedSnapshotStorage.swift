@@ -11,7 +11,7 @@ import MMMPromisingResult
 #endif
 
 /// Straightforward file-based SnapshotStorage implementation where each snapshot is stored in its own file.
-public class FileBasedSnapshotStorage: SnapshotStorage {
+open class FileBasedSnapshotStorage: SnapshotStorage {
 
 	/// Convenience initializer using a directory with the given name under `<sandbox>/Library`.
 	public convenience init(libraryDirectory: String) {
