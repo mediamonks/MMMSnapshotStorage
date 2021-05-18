@@ -94,32 +94,39 @@ open class StoredLoadable<Content: Codable>: MMMLoadable {
 			
 			guard let self = self else { return }
 			
-			let typeName = MMMTypeName(Content.self)
-			
-			switch result {
-			case .failure:
-				MMMLogError(self, "Error loading \(typeName) from storage, syncing...")
-			
-				self.doSync()
-			case .success(nil):
+			DispatchQueue.main.async {
 				
-				MMMLogTrace(self, "No storage for \(typeName) yet, syncing...")
+				let typeName = MMMTypeName(Content.self)
 				
-				self.doSync()
-			case .success(.some(let wrapper)):
+				switch result {
+				case .failure:
 				
-				if wrapper.date.isValid(using: self.policy) {
-					MMMLogTrace(self, "Found valid storage for \(typeName)")
-					
-					self.didLoadFromStorage(wrapper: wrapper)
-				} else {
-					MMMLogTrace(self, """
-					Storage expired for \(typeName), \
-					failed by policy \(self.policy) \
-					created at \(wrapper.date), syncing...
-					""")
+					MMMLogError(self, "Error loading \(typeName) from storage, syncing...")
 					
 					self.doSync()
+					
+				case .success(nil):
+					
+					MMMLogTrace(self, "No storage for \(typeName) yet, syncing...")
+					
+					self.doSync()
+					
+				case .success(.some(let wrapper)):
+					
+					if wrapper.date.isValid(using: self.policy) {
+						MMMLogTrace(self, "Found valid storage for \(typeName)")
+						
+						self.didLoadFromStorage(wrapper: wrapper)
+						
+					} else {
+						MMMLogTrace(self, """
+						Storage expired for \(typeName), \
+						failed by policy \(self.policy) \
+						created at \(wrapper.date), syncing...
+						""")
+						
+						self.doSync()
+					}
 				}
 			}
 		}
