@@ -14,6 +14,8 @@ public final class MockSnapshotStorage: SnapshotStorage {
 	public func containerForKey(_ key: String) -> SingleSnapshotContainer {
 		MockSingleSnapshotContainer(key: key)
 	}
+	
+	public func removeContainerForKey(_ key: String) -> Bool { true }
 }
 
 /// To mock a snapshot container by storing the last saved value in memory.
@@ -54,5 +56,20 @@ public final class MockSingleSnapshotContainer: SingleSnapshotContainer {
 	public func save<T: Encodable>(_ snapshot: T) {
 		// It's a mock one, inability to encode must be flagged asap.
 		self.snapshot = try! JSONEncoder().encode(snapshot)
+	}
+	
+	public func clean() -> Promising<Bool> {
+	
+		let sink = PromisingResultSink<Bool, Error>(queue: .main)
+		// Let's do this on a queue to make sure async loads are tested.
+		DispatchQueue.main.async {
+			sink.push(.success(self.cleanSync()))
+		}
+		return sink.drain
+	}
+	
+	public func cleanSync() -> Bool {
+		snapshot = nil
+		return true
 	}
 }

@@ -14,11 +14,16 @@ import MMMPromisingResult
 /// Each model that needs to store its state is provided (by its owner) with a container.
 /// The container is then used to save or load the state as a single "snapshot".
 public protocol SnapshotStorage {
+
 	/// Returns a container prepared to load/store snapshots of a single object.
 	///
 	/// The container is passed to the corresponding object by its owner.
 	/// The way the keys are assigned to each object is determined by the owner as well.
 	func containerForKey(_ key: String) -> SingleSnapshotContainer
+	
+	/// Remove a container (do clean up) for a given key, synchronously.
+	@discardableResult
+	func removeContainerForKey(_ key: String) -> Bool
 }
 
 /// Something that can hold a single "snapshot" of an object. This is to be passed to models that need to be
@@ -36,4 +41,13 @@ public protocol SingleSnapshotContainer {
 	/// Note that this might be performed asynchronously and lazily (e.g. only when the app goes to background),
 	/// so the snapshot should be able to encode itself on a different queue.
 	func save<T: Encodable>(_ snapshot: T)
+	
+	/// Clean this container (e.g. remove contents), but keep it alive for later use. If you don't need to keep the container
+	/// around, use `SnapshotStorage.removeContainerForKey(_:)` instead.
+	@discardableResult
+	func clean() -> Promising<Bool>
+	
+	/// The synchronous version of `clean()`.
+	@discardableResult
+	func cleanSync() ->  Bool
 }

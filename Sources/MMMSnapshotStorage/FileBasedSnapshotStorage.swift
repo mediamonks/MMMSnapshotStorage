@@ -44,7 +44,7 @@ open class FileBasedSnapshotStorage: SnapshotStorage {
 
 	public func containerForKey(_ key: String) -> SingleSnapshotContainer {
 
-		// TODO: prune `containers` only once in a while, not every time
+		// TODO: prune `containers` only once in a while, not every time.
 		containers = containers.filter { $0.value.container != nil }
 
 		if let info = containers[key], let container = info.container {
@@ -54,6 +54,20 @@ open class FileBasedSnapshotStorage: SnapshotStorage {
 			containers[key] = ContainerInfo(container: container)
 			return container
 		}
+	}
+	
+	public func removeContainerForKey(_ key: String) -> Bool {
+		
+		let container = containerForKey(key)
+		
+		guard container.cleanSync() else {
+			return false
+		}
+		
+		// Let's remove it from cache.
+		containers.removeValue(forKey: key)
+		
+		return true
 	}
 
 	// MARK: - Things informally available for child objects
@@ -170,6 +184,58 @@ open class FileBasedSnapshotStorage: SnapshotStorage {
 
 			MMMLogTrace(self, "Reading '\(MMMPathRelativeToAppBundle(pathURL.path))'...")
 			return try JSONDecoder().decode(type, from: Data(contentsOf: pathURL))
+		}
+		
+		public func clean() -> Promising<Bool> {
+			
+			MMMLogTrace(self, "Going to clean '\(key)'...")
+			
+			guard let parent = parent else { preconditionFailure() }
+			
+			let sink = PromisingResultSink<Bool, Error>.init(queue: parent.queue)
+			
+			parent.queue.async { [weak self] in
+			
+				guard let self = self else {
+					sink.push(.failure(NSError(domain: Self.self, message: "Self dissapeared.")))
+					return
+				}
+				
+				sink.push(.success(self._clean()))
+			}
+
+			return sink.drain
+		}
+		
+		public func cleanSync() -> Bool {
+		
+			guard let parent = parent else { preconditionFailure() }
+
+			// See comments on loadSync on why we're still using the queue.
+			var result: Bool?
+			
+			parent.queue.sync {
+				result = _clean()
+			}
+
+			return result ?? false
+		}
+		
+		private func _clean() -> Bool {
+			
+			do {
+				try FileManager.default.removeItem(atPath: pathURL.path)
+				
+				return true
+			} catch {
+				
+				MMMLogError(self, """
+				Could not remove container file at \
+				path '\(MMMPathRelativeToAppBundle(pathURL.path))': \(error.mmm_description)
+				""")
+			
+				return false
+			}
 		}
 	}
 }
