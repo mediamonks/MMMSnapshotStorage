@@ -20,6 +20,14 @@ open class FileBasedSnapshotStorage: SnapshotStorage {
 		self.init(rootDirectory: libraryDirURL.appendingPathComponent(libraryDirectory, isDirectory: true))
 	}
 
+	/// Convenience initializer using a directory with the given name under `<sandbox>/Library/Caches` or
+	/// whatever the OS gives us as it's caches directory.
+	public convenience init(cachesDirectory: String) {
+		let cachesDir = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first!
+		let cachesDirURL = URL(fileURLWithPath: cachesDir, isDirectory: true)
+		self.init(rootDirectory: cachesDirURL.appendingPathComponent(cachesDirectory, isDirectory: true))
+	}
+
 	public init(rootDirectory: URL) {
 		self.rootDirectory = rootDirectory
 		MMMLogTrace(self, "Using '\(MMMPathRelativeToAppBundle(rootDirectory.path))'")
