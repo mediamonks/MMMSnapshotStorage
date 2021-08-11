@@ -36,12 +36,24 @@ open class StoredLoadable<Content: Codable>: MMMLoadable {
 	
 	private let storage: SingleSnapshotContainer?
 	private let policy: InvalidationPolicy
+	private let populateDirectly: Bool
 	
 	/// Initialize a new `StoredLoadable`, the `storage` container should be provided by the owner of this class.
-	public init(storage: SingleSnapshotContainer?, policy: InvalidationPolicy? = nil) {
+	/// - Parameters:
+	///   - storage: The container to store the loadable content in.
+	///   - policy: The policy to use for invalidating the storage.
+	///	  - populateDirectly: If we should first populate the loadable
+	///	  					  (e.g. call `setDidSyncSuccessfully(content:)`) even when the cache is
+	///	  					  invalid, and then actually sync.
+	public init(
+		storage: SingleSnapshotContainer?,
+		policy: InvalidationPolicy? = nil,
+		populateDirectly: Bool = false
+	) {
 		
 		self.storage = storage
 		self.policy = policy ?? .never
+		self.populateDirectly = populateDirectly
 		
 		super.init()
 	}
@@ -118,6 +130,12 @@ open class StoredLoadable<Content: Codable>: MMMLoadable {
 						
 						self.didLoadFromStorage(wrapper: wrapper)
 						
+					} else if self.populateDirectly {
+						MMMLogTrace(self, "Storage invalid for \(typeName), but populating directly and syncing again")
+						
+						self.didLoadFromStorage(wrapper: wrapper)
+						self.doSync()
+						
 					} else {
 						MMMLogTrace(self, """
 						Storage expired for \(typeName), \
@@ -137,9 +155,16 @@ open class StoredLoadable<Content: Codable>: MMMLoadable {
 	private var avoidStorage = false
 	
 	/// Gets called when we successfully load from storage.
-	private func didLoadFromStorage(wrapper: Wrapper) {
+	private func didLoadFromStorage(wrapper: Wrapper, directlyPopulated: Bool = false) {
+		
 		avoidStorage = true
-		storedDate = wrapper.date
+		
+		if !directlyPopulated {
+			// Don't upate the storedDate when we populated directly, since this will
+			// influence 'needsSync'.
+			storedDate = wrapper.date
+		}
+		
 		setDidSyncSuccessfully(content: wrapper.content)
 		avoidStorage = false
 	}
@@ -177,9 +202,9 @@ open class StoredLoadable<Content: Codable>: MMMLoadable {
 	}
 }
 
-fileprivate extension Date {
+extension Date {
 	
-	func isValid(using policy: InvalidationPolicy) -> Bool {
+	fileprivate func isValid(using policy: InvalidationPolicy) -> Bool {
 		
 		// Since the date is in the past, we invert it.
 		let age = -timeIntervalSinceNow
