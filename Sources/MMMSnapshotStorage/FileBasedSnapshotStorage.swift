@@ -14,22 +14,36 @@ import MMMPromisingResult
 open class FileBasedSnapshotStorage: SnapshotStorage {
 
 	/// Convenience initializer using a directory with the given name under `<sandbox>/Library`.
-	public convenience init(libraryDirectory: String) {
+	public convenience init(libraryDirectory: String, queue: DispatchQueue? = nil) {
 		let libraryDir = NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first!
 		let libraryDirURL = URL(fileURLWithPath: libraryDir, isDirectory: true)
-		self.init(rootDirectory: libraryDirURL.appendingPathComponent(libraryDirectory, isDirectory: true))
+		self.init(
+			rootDirectory: libraryDirURL.appendingPathComponent(
+				libraryDirectory,
+				isDirectory: true
+			),
+			queue: queue
+		)
 	}
 
 	/// Convenience initializer using a directory with the given name under `<sandbox>/Library/Caches` or
 	/// whatever the OS gives us as it's caches directory.
-	public convenience init(cachesDirectory: String) {
+	public convenience init(cachesDirectory: String, queue: DispatchQueue? = nil) {
 		let cachesDir = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first!
 		let cachesDirURL = URL(fileURLWithPath: cachesDir, isDirectory: true)
-		self.init(rootDirectory: cachesDirURL.appendingPathComponent(cachesDirectory, isDirectory: true))
+		self.init(
+			rootDirectory: cachesDirURL.appendingPathComponent(
+				cachesDirectory,
+				isDirectory: true
+			),
+			queue: queue
+		)
 	}
-
-	public init(rootDirectory: URL) {
+	
+	public init(rootDirectory: URL, queue: DispatchQueue? = nil) {
 		self.rootDirectory = rootDirectory
+		self.explicitQueue = queue
+		
 		MMMLogTrace(self, "Using '\(MMMPathRelativeToAppBundle(rootDirectory.path))'")
 	}
 
@@ -81,15 +95,21 @@ open class FileBasedSnapshotStorage: SnapshotStorage {
 	// MARK: - Things informally available for child objects
 
 	fileprivate let rootDirectory: URL
-
-	// A private serial queue for all our async saves and loads.
-	fileprivate lazy var queue = DispatchQueue(
+	
+	// The queue we fallback on when there was no explicit queue provided.
+	private lazy var fallbackQueue = DispatchQueue(
 		label: MMMTypeName(Self.self),
 		qos: .utility,
 		attributes: [],
 		autoreleaseFrequency: .workItem,
 		target: nil
 	)
+	
+	// Provided queue, if any.
+	private let explicitQueue: DispatchQueue?
+	
+	// A private serial queue for all our async saves and loads.
+	fileprivate var queue: DispatchQueue { explicitQueue ?? fallbackQueue }
 
 	// All save operations are added into this group, so we can wait on it in deinit.
 	// This is useful only for unit tests as this object is expected to be alive all the time.
