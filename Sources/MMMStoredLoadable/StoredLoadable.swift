@@ -37,6 +37,7 @@ open class StoredLoadable<Content: Codable>: MMMLoadable {
 	private let storage: SingleSnapshotContainer?
 	private let policy: InvalidationPolicy
 	private let populateDirectly: Bool
+	private let queue: DispatchQueue?
 	
 	/// Initialize a new `StoredLoadable`, the `storage` container should be provided by the owner of this class.
 	/// - Parameters:
@@ -45,15 +46,19 @@ open class StoredLoadable<Content: Codable>: MMMLoadable {
 	///	  - populateDirectly: If we should first populate the loadable
 	///	  					  (e.g. call `setDidSyncSuccessfully(content:)`) even when the cache is
 	///	  					  invalid, and then actually sync.
+	///	  - queue: What queue we should execute from when loading from SnapshotStorage, defaults to `main`, you
+	///	  		   can pass `nil` to not switch queues.
 	public init(
 		storage: SingleSnapshotContainer?,
 		policy: InvalidationPolicy? = nil,
-		populateDirectly: Bool = false
+		populateDirectly: Bool = false,
+		queue: DispatchQueue? = .main
 	) {
 		
 		self.storage = storage
 		self.policy = policy ?? .never
 		self.populateDirectly = populateDirectly
+		self.queue = queue
 		
 		super.init()
 	}
@@ -106,7 +111,7 @@ open class StoredLoadable<Content: Codable>: MMMLoadable {
 			
 			guard let self = self else { return }
 			
-			DispatchQueue.main.async {
+			func execute() {
 				
 				let typeName = MMMTypeName(Content.self)
 				
@@ -146,6 +151,14 @@ open class StoredLoadable<Content: Codable>: MMMLoadable {
 						self.doSync()
 					}
 				}
+			}
+			
+			if let queue = self.queue {
+				queue.async {
+					execute()
+				}
+			} else {
+				execute()
 			}
 		}
 	}
