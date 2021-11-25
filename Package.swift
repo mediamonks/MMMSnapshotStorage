@@ -4,7 +4,8 @@ import PackageDescription
 let package = Package(
     name: "MMMSnapshotStorage",
     platforms: [
-        .iOS(.v11)
+        .iOS(.v11),
+        .watchOS(.v5)
     ],
     products: [
         .library(
