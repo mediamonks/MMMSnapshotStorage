@@ -22,8 +22,17 @@ jobs:
           checkName: Build iOS
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
-      - name: Install Sourcekitten
+      - name: Wait for test to succeed
         if: steps.wait-for-build.outputs.conclusion == 'success'
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-test
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Test iOS
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Install Sourcekitten
+        if: steps.wait-for-test.outputs.conclusion == 'success'
         run: brew install sourcekitten
 
       - name: Install Jazzy
@@ -39,7 +48,7 @@ jobs:
 
       - name: Generate docs
         run: ./DocGenerator -p ${{ github.event.repository.name }}
-
+        
       - name: Publish
         uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
