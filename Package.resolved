@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/mediamonks/MMMCommonCore",
         "state": {
           "branch": null,
-          "revision": "70ae367fe7c85a7ecb3752b867b47d071897dd3a",
-          "version": "1.2.1"
+          "revision": "7cd1e1bd713d78cd156b487942b072c4ffc8b161",
+          "version": "1.8.4"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/mediamonks/MMMLoadable",
         "state": {
           "branch": null,
-          "revision": "b2c145af18b3e2c834527cdbb1ff781f7c44ccd4",
-          "version": "1.5.0"
+          "revision": "dcdb31360fe32d9daef31e31c610e8a435af36fb",
+          "version": "1.7.1"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/mediamonks/MMMLog",
         "state": {
           "branch": null,
-          "revision": "c9425684a5a848596c1d02aa276028444ff492d5",
-          "version": "1.2.1"
+          "revision": "74dd34c10334216c0e1a8da062b1d0c6cda658ff",
+          "version": "1.3.1"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/mediamonks/MMMObservables",
         "state": {
           "branch": null,
-          "revision": "fc2ceb2233214a691f972cdbbeaf474039cef0f5",
-          "version": "1.2.0"
+          "revision": "17e9ed8bb227e3032f6d136197bfc8e80a3ce242",
+          "version": "1.5.0"
         }
       }
     ]
