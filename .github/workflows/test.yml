@@ -14,11 +14,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Prepare
+        run: gem install xcpretty
       - name: Test
         run: |
           device=`xcrun simctl list devices available | grep -oE 'iPhone.*?[^\(]+' | head -1 | awk '{$1=$1;print}'`
-          xcodebuild test -destination "name=$device" -scheme 'MMMSnapshotStorage'
-
+          xcodebuild test -destination "name=$device" -scheme 'MMMSnapshotStorage-Package' | xcpretty
   build_watchos:
     name: Test watchOS
     runs-on: macos-latest
@@ -26,7 +27,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Prepare
+        run: gem install xcpretty
       - name: Test
         run: |
           device=`xcrun simctl list devices available | grep -oE 'Apple Watch.*?[^\(]+' | head -1 | awk '{$1=$1;print}'`
-          xcodebuild test -destination "name=$device" -scheme 'MMMSnapshotStorage'
+          xcodebuild test -destination "name=$device" -scheme 'MMMSnapshotStorage-Package' | xcpretty

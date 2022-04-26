@@ -14,8 +14,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Prepare
+        run: gem install xcpretty
       - name: Build
-        run: xcodebuild build -scheme 'MMMSnapshotStorage' -destination generic/platform=iOS
+        run: xcodebuild build -scheme 'MMMSnapshotStorage' -destination generic/platform=iOS | xcpretty
 
   build_watchos:
     name: Build watchOS
@@ -24,5 +26,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Prepare
+        run: gem install xcpretty
       - name: Build
-        run: xcodebuild build -scheme 'MMMSnapshotStorage' -destination generic/platform=watchOS
+        run: xcodebuild build -scheme 'MMMSnapshotStorage' -destination generic/platform=watchOS | xcpretty
