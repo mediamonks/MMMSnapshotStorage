@@ -6,7 +6,7 @@
 Pod::Spec.new do |s|
 
 	s.name = "MMMSnapshotStorage"
-	s.version = "0.5.2"
+	s.version = "0.6.0"
 	s.summary = "Simple snapshot-based persistence."
 	s.description = s.summary
 	s.homepage = "https://github.com/mediamonks/#{s.name}"
@@ -23,13 +23,10 @@ Pod::Spec.new do |s|
 		"DEFINES_MODULE" => "YES"
 	}
 
-	s.subspec 'MMMPromisingResult' do |ss|
-		ss.source_files = [ "Sources/MMMPromisingResult/*.swift" ]
-	end
-
 	s.subspec 'MMMStoredLoadable' do |ss|
 		ss.source_files = [ "Sources/MMMStoredLoadable/*.swift" ]
 		ss.dependency "MMMLoadable"
+		ss.dependency "MMMPromisingResult"
 	end
 
 	s.subspec 'Swift' do |ss|
@@ -38,6 +35,7 @@ Pod::Spec.new do |s|
 		ss.dependency "#{s.name}/MMMStoredLoadable"
 		ss.dependency "MMMLog"
 		ss.dependency "MMMCommonCore"
+		ss.dependency "MMMPromisingResult"
 	end
 
 	s.test_spec 'Tests' do |ss|

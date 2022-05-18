@@ -4,10 +4,7 @@
 //
 
 import Foundation
-
-#if SWIFT_PACKAGE
 import MMMPromisingResult
-#endif
 
 /// Support for simple snapshot-based persistence.
 ///

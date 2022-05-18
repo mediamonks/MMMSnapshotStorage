@@ -4,10 +4,7 @@
 //
 
 import Foundation
-
-#if SWIFT_PACKAGE
 import MMMPromisingResult
-#endif
 
 public final class MockSnapshotStorage: SnapshotStorage {
 

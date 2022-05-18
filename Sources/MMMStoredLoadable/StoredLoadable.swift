@@ -6,9 +6,9 @@
 import MMMCommonCore
 import MMMLoadable
 import MMMLog
+import MMMPromisingResult
 
 #if SWIFT_PACKAGE
-import MMMPromisingResult
 import MMMSnapshotStorage
 #endif
 

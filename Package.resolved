@@ -36,6 +36,15 @@
           "revision": "17e9ed8bb227e3032f6d136197bfc8e80a3ce242",
           "version": "1.5.0"
         }
+      },
+      {
+        "package": "MMMPromisingResult",
+        "repositoryURL": "https://github.com/mediamonks/MMMPromisingResult",
+        "state": {
+          "branch": null,
+          "revision": "83ac3281679cc9f40095dda733e152529c50b7fb",
+          "version": "0.1.0"
+        }
       }
     ]
   },

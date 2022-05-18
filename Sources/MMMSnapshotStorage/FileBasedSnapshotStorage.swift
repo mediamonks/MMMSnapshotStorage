@@ -5,10 +5,7 @@
 
 import MMMCommonCore
 import MMMLog
-
-#if SWIFT_PACKAGE
 import MMMPromisingResult
-#endif
 
 /// Straightforward file-based SnapshotStorage implementation where each snapshot is stored in its own file.
 open class FileBasedSnapshotStorage: SnapshotStorage {
