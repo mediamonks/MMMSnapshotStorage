@@ -1,12 +1,12 @@
 #
 # MMMSnapshotStorage. Part of MMMTemple.
-# Copyright (C) 2016-2021 MediaMonks. All rights reserved.
+# Copyright (C) 2016-2023 MediaMonks. All rights reserved.
 #
 
 Pod::Spec.new do |s|
 
 	s.name = "MMMSnapshotStorage"
-	s.version = "0.6.0"
+	s.version = "0.6.1"
 	s.summary = "Simple snapshot-based persistence."
 	s.description = s.summary
 	s.homepage = "https://github.com/mediamonks/#{s.name}"
@@ -25,14 +25,12 @@ Pod::Spec.new do |s|
 
 	s.subspec 'MMMStoredLoadable' do |ss|
 		ss.source_files = [ "Sources/MMMStoredLoadable/*.swift" ]
+		ss.dependency "#{s.name}/Core"
 		ss.dependency "MMMLoadable"
-		ss.dependency "MMMPromisingResult"
 	end
 
-	s.subspec 'Swift' do |ss|
+	s.subspec 'Core' do |ss|
 		ss.source_files = [ "Sources/#{s.name}/*.swift" ]
-		ss.dependency "#{s.name}/MMMPromisingResult"
-		ss.dependency "#{s.name}/MMMStoredLoadable"
 		ss.dependency "MMMLog"
 		ss.dependency "MMMCommonCore"
 		ss.dependency "MMMPromisingResult"
@@ -41,6 +39,4 @@ Pod::Spec.new do |s|
 	s.test_spec 'Tests' do |ss|
 		ss.source_files = "Tests/*.{m,swift}"
 	end
-
-	s.default_subspec = 'Swift'
 end
