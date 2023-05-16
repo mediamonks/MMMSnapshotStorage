@@ -222,7 +222,7 @@ open class FileBasedSnapshotStorage: SnapshotStorage {
 			parent.queue.async { [weak self] in
 			
 				guard let self = self else {
-					sink.push(.failure(NSError(domain: Self.self, message: "Self dissapeared.")))
+					sink.push(.failure(NSError(domain: Self.self, message: "Self disappeared")))
 					return
 				}
 				
@@ -247,18 +247,15 @@ open class FileBasedSnapshotStorage: SnapshotStorage {
 		}
 		
 		private func _clean() -> Bool {
-			
 			do {
 				try FileManager.default.removeItem(atPath: pathURL.path)
-				
 				return true
 			} catch {
-				
-				MMMLogError(self, """
-				Could not remove container file at \
-				path '\(MMMPathRelativeToAppBundle(pathURL.path))': \(error.mmm_description)
-				""")
-			
+				if error._domain == NSCocoaErrorDomain && error._code == CocoaError.Code.fileNoSuchFile.rawValue {
+					// Let's don't report anything if the file does not exist, it's a common situation.
+				} else {
+					MMMLogError(self, "Could not remove '\(MMMPathRelativeToAppBundle(pathURL.path))': \(error.mmm_description)")
+				}
 				return false
 			}
 		}
